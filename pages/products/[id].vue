@@ -34,6 +34,7 @@
 <script setup>
 
 
+    
 let name = ref('')
  let brand = ref('')
  let price = ref('')
@@ -57,7 +58,7 @@ const id = useRoute().params.id
     price = currentProd.value[0].price
     desc = currentProd.value[0].description
 
-
+    // ************** put method
     const updateProd = async ()=>{
         try{
             await $fetch(`https://dummyjson.com/products/${id}` , {

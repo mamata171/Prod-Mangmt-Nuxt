@@ -67,6 +67,8 @@ function clearForm(){
     
    
 }
+
+// post method
 const createProd = async () => {
         try {
            let response = await $fetch('https://dummyjson.com/products/add', {

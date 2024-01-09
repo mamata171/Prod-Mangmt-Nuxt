@@ -11,8 +11,16 @@
                     <li class="nav-item">
                     <NuxtLink class="nav-link active" aria-current="page" to="/">Home</NuxtLink>
                     </li>
+
+                    <li class="nav-item">
+                        <NuxtLink class="nav-link active" to="/products/cartPage">
+                          Cart  <nuxt-icon name="cart" class="big-cart ms-1"></nuxt-icon>
+                        <span> ({{ cartStore.numberofItems }})</span>  
+                        </NuxtLink> 
+                    </li>
                   
                 </ul>
+                
 
                 <form class="d-flex">
                     <NuxtLink to="/products/AddEditProd">
@@ -71,12 +79,15 @@
 </template>
 
 <script setup>
+import { useCartStore } from '~/store/cartStore';
+
     
     let products = ref([])
 
+    let cartStore = useCartStore()
     // Fetching data
     const {data,pending,error} = await useFetch('https://dummyjson.com/products?limit=100')
-    products.value = data._rawValue.products
+    products.value = data._value.products                               
 
    
     
