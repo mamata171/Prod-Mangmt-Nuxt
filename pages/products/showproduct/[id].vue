@@ -1,12 +1,12 @@
 <template>
-    <!-- {{ prodObj }} -->
+    {{ cartStore.numberOfItems }}
     <div class="navbar">
         <NuxtLink to="/"><p class="home-btn">Home</p> </NuxtLink>
        
        <NuxtLink to="/products/cartPage">
         <button class="go-to-cart-btn"> Go to Cart
             <nuxt-icon name="cart" class="big-cart ms-1"></nuxt-icon>
-            <span> ({{ cartStore.numberofItems }})</span>
+            <span> ({{ cartStore.numberOfItems }})</span>
         </button>
     </NuxtLink> 
 
@@ -60,11 +60,19 @@
 
             <div class="right4 mt-3">
                 <div class="wishlist">
-                    <nuxt-icon name="wishlist" class="icon"></nuxt-icon> <span class="ms-1 btn-com btn-wish">WishList</span>
+                     <span class="btn-com btn-wish"><nuxt-icon name="wishlist" class="icon me-2"></nuxt-icon>WishList</span>
                 </div>
 
-                <div class="cart cursor-pointer" @click="()=>{cartStore.addtoCart(prodObj)}">
-                    <nuxt-icon name="cart" class="icon"></nuxt-icon> <span class="ms-1 btn-com btn-cart">Add to cart</span>
+                <div class="cart">
+                     <span class="ms-1 btn-cart"> 
+                        <nuxt-icon name="cart" class="icon me-2"></nuxt-icon> 
+                        <span v-if="!added" @click="addtocartfun(prodObj)" class="addtocart">Add to cart</span>
+
+                        <span class="incDecBtn" v-if="added">
+                            <button @click="deccartItem(prodObj)"> - <span class="text-small">{{ clickedbtn=='decbtn'? prodObj.quantity :'' }}</span></button>
+                            <button @click="incrcartItem(prodObj)"> + <span class="text-small">{{clickedbtn=='incbtn'? prodObj.quantity :'' }}</span></button>
+                        </span>
+                    </span>
                 </div>
             </div>
             
@@ -72,16 +80,19 @@
 
        </div>
 
+
+
 </template>
 
+<!-- ()=>{cartStore.addtoCart(prodObj)} -->
 
 <script setup>
 const id = useRoute().params.id
 let products = ref([])
 let currentProd = ref([])
 let prodObj = ref({})
-
-// product properties
+let added = ref(false)
+let clickedbtn = ref('')
 
 
 // Fetching data
@@ -90,10 +101,53 @@ products.value = data._rawValue.products
 
 currentProd.value = products.value.filter((prod)=> prod.id == id)
 prodObj = currentProd.value[0]
+let quantity = ref(prodObj.quantity)
 
 import {useCartStore} from "../../../store/cartStore"
 let cartStore = useCartStore()
 
+if(cartStore.numberOfItems){
+    let index = cartStore.cartItems.findIndex((elm) => elm.id == prodObj.id)
+    if(index!=-1){
+        added.value = true
+        console.log("already added : ",added.value);
+    }
+
+}
+
+
+
+function addtocartfun(prodObj){
+    prodObj.quantity = 1
+    cartStore.addToCart(prodObj)
+    added.value= true
+    console.log("added value ",added.value); 
+}       
+
+function incrcartItem(prodObj){
+    clickedbtn.value = "incbtn"
+    cartStore.addToCart(prodObj)
+    console.log("clicked button value :",clickedbtn.value);
+}
+
+
+
+async function deccartItem(prodObj) {
+    clickedbtn.value = "decbtn"
+    console.log("clicked button value :",clickedbtn.value);
+  await cartStore.deleteFromCart(prodObj); 
+
+  // Check for product removal:
+  const isRemoved = !cartStore.cartItems.some((item) => item.id === prodObj.id);
+
+  if (isRemoved) {
+    added.value = false; 
+    clickedbtn.value= ''
+  } else {
+    console.log("Product quantity decremented:", prodObj.quantity);
+    // Update UI or perform other actions as needed
+  }
+}
 
 
 
@@ -101,6 +155,9 @@ let cartStore = useCartStore()
 
 
 <style>
+.text-small{
+    font-size: 11px;
+}
 .icon{
     font-size: 1.3rem;
 }
@@ -208,9 +265,41 @@ let cartStore = useCartStore()
 .btn-wish{
     background-color: rgb(240, 29, 92);
 }
+
+
+.addtocart{
+    cursor: pointer;
+}
+
+.cart{
+    width: 150px;
+}
+
 .btn-cart{
     background-color: rgb(255, 174, 0);
+    padding: 4px 10px;
+    color: white;
+    border-radius: 7px;
 }
+
+.incDecBtn button{
+    border: none;
+    margin-right: 5px;
+    background-color: transparent;
+    font-size: 1.3rem;
+    color: white;
+    cursor: pointer;
+    display: inline-block;
+ 
+
+}
+
+.incDecBtn button:hover{
+    transform: scaleX(1.5);
+
+
+}
+
 @media screen and (max-width:780px) {
     .product-details{
         flex-direction: column;

@@ -5,10 +5,11 @@
 
     <h2>Shopping Cart</h2>
 
+    <!-- <div v-if="cartStore.numberOfItems>=1"> -->
     <div  v-for="product in cartStore.cartItems">
-        <div class="cartItem"  v-if="product.id!='dummyid'">
+        <div class="cartItem">
              <div class="left-side">
-                    <img :src="product.images[0]" alt="image">
+                    <img :src="product?.images[0]" alt="image">
              </div>
 
 
@@ -18,14 +19,14 @@
                 <div class="brand"> Brand : {{ product.brand }}</div>
                 <div class="in-stock">In stock</div>
                 <div class="rating">{{ product.rating}} ratings </div>
+                <div> Quantity : {{ product.quantity }}</div>
                 <div><button class="btn btn-success my-2">Buy now</button> </div>
+
             </div>
         </div>
 
-        <hr v-if="product.id!='dummyid'">
-
- 
-           
+        <hr>
+<!-- </div>    -->
     </div>
 </template>
 
